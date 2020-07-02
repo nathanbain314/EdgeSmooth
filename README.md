@@ -1,0 +1,2 @@
+# EdgeSmooth
+Edge preserving smoothing

@@ -13,11 +13,11 @@ int main( int argc, char **argv )
 
     ValueArg<int> KArg( "k", "k", "K value", false, 3, "int", cmd);
 
-    ValueArg<float> sigma2Arg( "t", "sigma2", "Sigma2 value", false, 3.0, "float", cmd);
+    ValueArg<float> sigma2Arg( "t", "sigma2", "Sigma2 value", false, 1.0f, "float", cmd);
 
-    ValueArg<float> sigma1Arg( "s", "sigma1", "Sigma1 value", false, 1.0, "float", cmd);
+    ValueArg<float> sigma1Arg( "s", "sigma1", "Sigma1 value", false, 2.0f, "float", cmd);
 
-    ValueArg<float> lambdaArg( "l", "lambda", "Lambda value", false, 0.01f, "float", cmd);
+    ValueArg<float> lambdaArg( "l", "lambda", "Lambda value", false, 0.005f, "float", cmd);
 
     ValueArg<string> outputArg( "o", "output", "Output name", true, "out", "string", cmd);
 

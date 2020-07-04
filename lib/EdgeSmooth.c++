@@ -315,7 +315,7 @@ void solveLinearEquation( double * s, double * in, double * wx, double * wy, dou
   delete [] tin;
 }
 
-void generateEdgeWeights( string inputName )
+void generateEdgeWeights( string inputName, string outputName )
 {
   VImage edgeImage = VImage::vipsload( (char *)inputName.c_str() ).canny();//VImage::option()->set( "sigma", 1 ));//.colourspace(VIPS_INTERPRETATION_B_W);
 
@@ -324,20 +324,97 @@ void generateEdgeWeights( string inputName )
   int width = edgeImage.width();
   int height = edgeImage.height();
 
-  unsigned char * edgeData2 = new unsigned char[width*height];
+  unsigned char * edgeData2 = new unsigned char[3*width*height];
 
-  float m = 0;
+  float mi = 0.5;
+  float ma = 1.0;
+
+  for( int p = 0; p < 3*width*height; ++p )
+  {
+    if( edgeData1[p] > ma )
+    {
+      edgeData2[p] = 255;
+    }
+    else if( edgeData1[p] > mi )
+    {
+      edgeData2[p] = 100;
+    }
+    else
+    {
+      edgeData2[p] = 0;
+    }
+  }
+
+  int n1 = 0;
+  for( bool changed = true; changed; )
+  {
+//    cout << n1++ << endl;
+    changed = false;
+    for( int i = 0, p = 0; i < height; ++i )
+    {
+  //    break;
+      for( int j = 0; j < width; ++j, ++p )
+      {
+        for( int k = 0; k < 3; ++k )
+        {
+          if( edgeData2[3*p+k] == 255 )
+          {
+            edgeData2[3*p+k] = 255;
+          }
+          else if( edgeData2[3*p+k] == 100 )
+          {
+            bool g = false;
+            for( int i1 = -1; i1 <= 1; ++i1 )
+            {
+              for( int j1 = -1; j1 <= 1; ++j1 )
+              {
+                if( i + i1 < 0 || i + i1 >= height ) continue;
+                if( j + j1 < 0 || j + j1 >= width ) continue;
+                int p2 = (i+i1)*width + j+j1;
+                if( edgeData2[3*p2+k] == 255 )
+                {
+                  g = true;
+                  changed = true;
+                  break;
+                }
+              }
+            }
+            if( g )
+            {
+              edgeData2[3*p+k] = 255;
+            }
+            else
+            {
+              edgeData2[3*p+k] = 100;
+            }
+          }
+          else
+          {
+            edgeData2[3*p+k] = 0;
+          }
+        }
+      }
+    }
+  }
+
+
+  for( int p = 0; p < 3*width*height; ++p )
+  {
+    if( edgeData2[p] == 100 )
+    {
+      edgeData2[p] = 0;
+    }
+  }
 
   for( int p = 0; p < width*height; ++p )
   {
     edgeData2[p] = 0;
-    if( edgeData1[3*p+0] > 1.0 ) edgeData2[p] = 255;
-    if( edgeData1[3*p+1] > 1.0 ) edgeData2[p] = 255;
-    if( edgeData1[3*p+2] > 1.0 ) edgeData2[p] = 255;
+    if( edgeData2[3*p+0] == 255 ) edgeData2[p] = 255;
+    if( edgeData2[3*p+1] == 255 ) edgeData2[p] = 255;
+    if( edgeData2[3*p+2] == 255 ) edgeData2[p] = 255;
   }
 
-  VImage::new_from_memory( edgeData2, width*height, width, height, 1, VIPS_FORMAT_UCHAR ).vipssave("edge.png");
-
+  VImage::new_from_memory( edgeData2, width*height, width, height, 1, VIPS_FORMAT_UCHAR ).vipssave((char *)outputName.c_str());
 }
 
 void RunEdgeSmooth( string inputName, string outputName, double lambda = 0.01f, double sigma1 = 1, double sigma2 = 3, int K = 1, double dec = 2.0f )
@@ -395,4 +472,7 @@ void RunEdgeSmooth( string inputName, string outputName, double lambda = 0.01f, 
   }
 
   VImage::new_from_memory( c, 3*width*height, width, height, 3, VIPS_FORMAT_UCHAR ).vipssave((char *)outputName.c_str());
+
+  generateEdgeWeights( inputName, "edge1.png" );
+  generateEdgeWeights( outputName, "edge2.png" );
 }

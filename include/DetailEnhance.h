@@ -24,4 +24,4 @@ typedef Eigen::Triplet<double> T;
 using namespace vips;
 using namespace std;
 
-void RunEdgeSmooth( string inputName, string outputName, double lambda, double sigma1, double sigma2, int K, double dec );
+void RunDetailEnhance( string inputName, string outputName );

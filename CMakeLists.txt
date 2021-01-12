@@ -19,7 +19,7 @@ include_directories(include)
 
 file(GLOB SOURCE_FILES lib/progress_bar.c++)
 
-set( EXECUTABLES EdgeSmooth )
+set( EXECUTABLES EdgeSmooth DetailEnhance )
 
 set (CMAKE_CXX_STANDARD 11)
 set(VIPS_LDFLAGS pthread ${VIPS_LDFLAGS})
